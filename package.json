@@ -1,10 +1,12 @@
 {
   "name": "@fireless/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "FireLess core package",
   "main": "index.js",
   "files": [
-    "./dist/**/**.(js|ts)"
+    "dist",
+    "index.js",
+    "index.d.ts"
   ],
   "scripts": {
     "build": "rm -rf ./dist && tsc",
