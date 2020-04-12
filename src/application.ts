@@ -1,12 +1,15 @@
-import { Class } from 'utility-types';
-import { ModuleContext } from './context';
-import { ContextRegistry } from './singleton/context-registry';
-import { DependencyContainer } from './singleton/dependency-container';
+import {Class} from 'utility-types';
+import {ModuleContext} from './context';
+import {ContextRegistry} from './singleton/context-registry';
+import {resolveDependency} from "./helpers";
+import {AbstractModule, AbstractStream} from "./abstract";
 
 type ModuleAndContextRecord<T = never> = {
   module: Class<any>;
   context: ModuleContext<any, any, any, any> | T;
 };
+
+type ModuleContextAndStream = { module: AbstractModule<any, any, any, any>, stream: AbstractStream<any, any, any>, context: ModuleContext<any, any, any, any> }
 
 export async function createApplication(modules: Class<any>[]) {
   const moduleContextList: ModuleContext<any, any, any, any>[] = modules
@@ -33,11 +36,20 @@ export async function createApplication(modules: Class<any>[]) {
     )
     .map(({ context }) => context);
 
-  await Promise.all(
-    moduleContextList.map((context) => {
-      DependencyContainer.getInstance()
-        .resolve(context.Constructor)
-        .init(context);
+  const initModules: ModuleContextAndStream[] = await Promise.all(
+    moduleContextList.map(async (context): Promise<ModuleContextAndStream> => {
+      const module = resolveDependency(context.Constructor);
+      const stream = await module.init(context);
+
+      return {
+          module, context, stream
+      }
     }),
   );
+
+  await Promise.all(
+      initModules.map(async ({ module, stream, context }: ModuleContextAndStream) => {
+          await module.registerControllers(stream, context)
+      })
+  )
 }
