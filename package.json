@@ -1,6 +1,6 @@
 {
   "name": "@fireless/core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "FireLess core package",
   "main": "index.js",
   "files": [
@@ -14,7 +14,8 @@
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
