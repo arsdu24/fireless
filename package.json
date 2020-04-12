@@ -1,10 +1,18 @@
 {
   "name": "@fireless/core",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "FireLess core package",
   "main": "index.js",
+  "files": [
+    "./dist/**/**.(js|ts)"
+  ],
   "scripts": {
-    "test": "jest"
+    "build": "rm -rf ./dist && tsc",
+    "format": "prettier --write \"(src|test)/**/*.ts\"",
+    "lint": "eslint \"{src,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
   },
   "repository": {
     "type": "git",

@@ -1,21 +1,21 @@
-import "reflect-metadata";
-import { Class } from "utility-types";
+import 'reflect-metadata';
+import { Class } from 'utility-types';
 
-export class DIContainer {
-  private static instance: DIContainer;
+export class DependencyContainer {
+  private static instance: DependencyContainer;
 
   private providers: Map<Class<any>, any> = new Map();
   private unsupportedDependencies: Function[] = [String, Number, Boolean];
 
-  private constructor() {
-    DIContainer.instance = this;
-  }
+  // eslint-disable-next-line no-empty-function, @typescript-eslint/no-empty-function
+  private constructor() {}
 
   getDependencies<T>(Target: Class<T>): Class<any>[] {
     return Reflect.getMetadata('design:paramtypes', Target) || [];
   }
 
   resolve<T>(Target: Class<T>): T {
+    debugger;
     if (this.providers.has(Target)) {
       return this.providers.get(Target);
     }
@@ -55,13 +55,14 @@ export class DIContainer {
     return provider;
   }
 
-  rewriteProvider(from: Class<any>, to: any) {
+  rewriteProvider<T extends {}>(from: Class<T>, to: T) {
     this.providers.set(from, to);
+    debugger;
   }
 
-  static getInstance(): DIContainer {
+  static getInstance(): DependencyContainer {
     if (!this.instance) {
-      this.instance = new DIContainer();
+      this.instance = new DependencyContainer();
     }
 
     return this.instance;
