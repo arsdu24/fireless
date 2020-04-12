@@ -62,7 +62,7 @@ export abstract class AbstractModule<O extends {},
                     ) {
                         await this.registerControllerHandler(
                             stream,
-                            (target[methodName as keyof Controller] as AsyncResolver<E, any>).bind(target),
+                            (target[methodName as keyof Controller] as Function).bind(target),
                             handlerContext,
                         );
                     }
@@ -73,9 +73,17 @@ export abstract class AbstractModule<O extends {},
 
     protected async registerControllerHandler<T = any>(
         stream: AbstractStream<E, CO, HO>,
-        handler: AsyncResolver<E, any>,
+        handler: Function,
         handlerContext: HandlerContext<HO, E>,
     ): Promise<void> {
-        await stream.subscribe(handlerContext.options as HO, handler);
+        const paramResolver: AsyncResolver<E, any> = async (data: E) => {
+            const args: any[] = await Promise.all(
+                handlerContext.paramResolverList.map(resolver => resolver(data))
+            );
+
+            return handler(...args);
+        }
+
+        await stream.subscribe(handlerContext.options as HO, paramResolver);
     }
 }
